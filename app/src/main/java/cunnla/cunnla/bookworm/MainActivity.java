@@ -13,6 +13,7 @@ import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -20,7 +21,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
 
     Button btnAdd;
 
@@ -29,6 +30,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ListView listBooks;
 
     Book selectedBook;
+
+    Intent intent;
+    final static int INTENT_CODE_ADD = 1;
+    final static int INTENT_CODE_VIEW = 2;
+    final static int INTENT_CODE_EDIT = 3;
+    final static int INTENT_CODE_DELETE = 4;
 
 
     final String LOG_TAG = "myLogs";
@@ -43,10 +50,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnAdd.setOnClickListener(this);
 
         listBooks = (ListView) findViewById(R.id.listBooks);
+        listBooks.setOnItemClickListener(this);
         registerForContextMenu(listBooks);
 
+        dbHelper = new DBHelper(this);
+
+        selectedBook = new Book();
         showAllBooks();
 
+
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Log.d(LOG_TAG, "itemClick: position = " + position + ", id = " + id);
+
+        selectedBook = (Book)parent.getAdapter().getItem(position);  // getting our object Book from position in ListView
+
+        intent = new Intent(this, ViewBook.class);
+        selectedBook.putDetailsToIntent(intent);
+        startActivityForResult(intent, INTENT_CODE_VIEW);
     }
 
     @Override
@@ -68,17 +91,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         // TODO Auto-generated method stub
+
         switch (item.getItemId()) {
             case 1:  // view
-                Toast.makeText(this, "View: "+selectedBook.bookName, Toast.LENGTH_SHORT).show();
+                Log.d("myLogs","Main activity: View: " + selectedBook.toString());
+                intent = new Intent(this, ViewBook.class);
+                selectedBook.putDetailsToIntent(intent);
+                startActivityForResult(intent, INTENT_CODE_VIEW);
                 break;
             case 2:  // edit
-                Toast.makeText(this, "Edit: "+selectedBook.bookName, Toast.LENGTH_SHORT).show();
+                Log.d("myLogs","Main activity: Edit: " + selectedBook.toString());
+                intent = new Intent(this, EditBook.class);
+                selectedBook.putDetailsToIntent(intent);
+                startActivityForResult(intent, INTENT_CODE_EDIT);
                 break;
             case 3: // delete
-                Toast.makeText(this, "Delete: "+selectedBook.bookName+", id: "+selectedBook.id, Toast.LENGTH_LONG).show();
-                db.delete("bookTable", "id = " + selectedBook.id, null);
-                showAllBooks();
+                Log.d("myLogs","Main activity: Delete: " + selectedBook.toString());
+                intent = new Intent(this, DeleteBook.class);
+                startActivityForResult(intent, INTENT_CODE_DELETE);
                 break;
         }
         return super.onContextItemSelected(item);
@@ -86,37 +116,57 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-
-        Intent intent = new Intent(this, AddBook.class);
-        startActivityForResult(intent, 1);
+        switch (v.getId()) {
+            case R.id.btnAdd:
+            intent = new Intent(this, AddBook.class);
+            startActivityForResult(intent, INTENT_CODE_ADD);
+            break;
+        }
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (data == null) {return;}
+        if (data == null) {
+            return;
+        }
 
-        ContentValues cv = new ContentValues();
+        if (resultCode == RESULT_OK) {
+            db = dbHelper.getWritableDatabase();
+            switch (requestCode) {
+                case INTENT_CODE_ADD:    // add book activity
+                    selectedBook = new Book();
+                    selectedBook.getDetailsFromIntent(data);
+                    db.insert("bookTable", null, selectedBook.addBookToCV());
+                    showAllBooks();
+                    break;
+                case INTENT_CODE_VIEW:    // view book activity
+                    showAllBooks();
+                    break;
+                case INTENT_CODE_EDIT:    // edit book activity
+                    selectedBook.getDetailsFromIntent(data);
+                    db.update("bookTable", selectedBook.addBookToCV(),"id = " + selectedBook.id, null);
+                    showAllBooks();
+                    break;
+                case INTENT_CODE_DELETE:    // delete book activity
+                    db.delete("bookTable", "id = " + selectedBook.id, null);
+                    showAllBooks();
+                    break;
+            }
+            dbHelper.close();
 
-        // fill the table
-        cv.clear();
-        cv.put("bookDate", data.getStringExtra("bookDate"));
-        cv.put("bookName", data.getStringExtra("bookName"));
-        cv.put("bookAuthor", data.getStringExtra("bookAuthor"));
-        cv.put("bookGenre", data.getStringExtra("bookGenre"));
-        cv.put("bookNotes", data.getStringExtra("bookNotes"));
-        db.insert("bookTable", null, cv);
-
-        showAllBooks();
+        } else if (resultCode == RESULT_CANCELED){
+            showAllBooks();
+            } else  {
+                 Toast.makeText(this, "Wrong result", Toast.LENGTH_SHORT).show();
+                 }
 
     }
 
     public void showAllBooks(){
 
-        dbHelper = new DBHelper(this);
         db = dbHelper.getWritableDatabase();
-
         Cursor cursor = db.query("bookTable", null, null, null, null, null, null);
-
         ArrayList<Book> booksList = new ArrayList<>();
 
         if (cursor.moveToFirst()) {
@@ -133,34 +183,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.d(LOG_TAG, "0 rows");
 
         cursor.close();
-//        dbHelper.close();
+        dbHelper.close();
 
         BookAdapter bookAdapter = new BookAdapter(this, 0, booksList);
         listBooks.setAdapter(bookAdapter);
     }
 
-    public class DBHelper extends SQLiteOpenHelper {
-
-        DBHelper(Context context){
-            super(context, "myDB", null, 1);
-        }
-
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            Log.d(LOG_TAG, "--- onCreate database ---");
-
-            // создаем таблицу
-            db.execSQL("create table bookTable ("
-                    + "id integer primary key,"
-                    + "bookDate text," + "bookName text," + "bookAuthor text," + "bookGenre text,"+ "bookNotes text"
-                    + ");");
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-        }
-    }
 
 
 }

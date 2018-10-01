@@ -16,7 +16,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AddBook"></activity>
+        <activity android:name=".AddBook" />
+        <activity android:name=".ViewBook" />
+        <activity android:name=".EditBook" />
+        <activity android:name=".DeleteBook"
+            android:theme="@style/Theme.AppCompat.Dialog"
+            android:excludeFromRecents="true">
+        </activity>
     </application>
 
 </manifest>
