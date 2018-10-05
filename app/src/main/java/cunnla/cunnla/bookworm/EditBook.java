@@ -1,17 +1,33 @@
 package cunnla.cunnla.bookworm;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class EditBook extends AppCompatActivity implements View.OnClickListener {
 
     Button btnOK, btnCancel;
-    EditText etDate, etName, etAuthor, etGenre, etNotes;
+    EditText etName, etAuthor, etGenre, etNotes;
+
+    TextView tvDate;
+    Date theDate;
+    String dateString;
+
     Intent intent;
 
     public Book selectedBook;
@@ -26,7 +42,10 @@ public class EditBook extends AppCompatActivity implements View.OnClickListener 
         btnCancel = (Button) findViewById(R.id.btnCancel);
         btnCancel.setOnClickListener(this);
 
-        etDate = (EditText) findViewById(R.id.etDate);
+        tvDate = (TextView) findViewById(R.id.tvDate);
+        tvDate.setOnClickListener(this);
+
+
         etName = (EditText)findViewById(R.id.etName);
         etAuthor = (EditText)findViewById(R.id.etAuthor);
         etGenre = (EditText)findViewById(R.id.etGenre);
@@ -37,11 +56,13 @@ public class EditBook extends AppCompatActivity implements View.OnClickListener 
         selectedBook = new Book();
         selectedBook.getDetailsFromIntent(intent);
 
-        etDate.setText(selectedBook.bookDate);
+        tvDate.setText(selectedBook.bookDateNice());
         etName.setText(selectedBook.bookName);
         etAuthor.setText(selectedBook.bookAuthor);
         etGenre.setText(selectedBook.bookGenre);
         etNotes.setText(selectedBook.bookNotes);
+
+        dateString = selectedBook.bookDate;
 
     }
 
@@ -50,9 +71,8 @@ public class EditBook extends AppCompatActivity implements View.OnClickListener 
 
         switch (v.getId()) {
             case R.id.btnOk:
-                if (!etName.getText().toString().equalsIgnoreCase("")) { // if a name is entered
-
-                    selectedBook.bookDate = etDate.getText().toString();
+                if (!etName.getText().toString().equalsIgnoreCase("") ) {              // if a name is entered
+                    selectedBook.bookDate = dateString;
                     selectedBook.bookName = etName.getText().toString();
                     selectedBook.bookAuthor = etAuthor.getText().toString();
                     selectedBook.bookGenre = etGenre.getText().toString();
@@ -71,7 +91,53 @@ public class EditBook extends AppCompatActivity implements View.OnClickListener 
                 setResult(RESULT_CANCELED, intent);
                 finish();
                 break;
+            case R.id.tvDate:
+                dateString = setDateString();
+                break;
         }
+
+    }
+
+    public String setDateString(){
+
+        Calendar myCalendar= Calendar.getInstance();
+
+        //////////////////
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        theDate = new Date();
+
+        try {
+            if (dateString!=null) {
+                theDate = df.parse(dateString);
+            }
+        } catch (ParseException e) {
+            //Handle exception here, most of the time you will just log it.
+            e.printStackTrace();
+        }
+
+        myCalendar.setTime(theDate);
+        /////////////////
+
+        int year=myCalendar.get(Calendar.YEAR);
+        int month=myCalendar.get(Calendar.MONTH);
+        int day=myCalendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog.OnDateSetListener datePickerDialogListener = new DatePickerDialog.OnDateSetListener() {
+            public void onDateSet(DatePicker view, int year, int month, int day){
+                month++;   //because in Android month starts from 0
+                String sMonth = Integer.toString(month); // this is to make the string look like YYYY-MM-DD HH:mm:SS
+                String sDay = Integer.toString(day);     // which is the mysql date format
+                if (month<10) {sMonth = "0"+month;}
+                if (day<10) {sDay = "0"+day;}
+                dateString = (year+"-"+sMonth+"-"+sDay+" 00:00:00");
+                Log.d("myLogs", "dateString: "+ dateString);
+                tvDate.setText(sDay+"."+sMonth+"."+year);
+            }
+        };
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, datePickerDialogListener, year, month, day);
+        datePickerDialog.show();
+
+        return dateString;
 
     }
 }

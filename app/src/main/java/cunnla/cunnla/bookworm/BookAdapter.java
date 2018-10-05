@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.view.View;
 import android.widget.TextView;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +37,8 @@ public class BookAdapter extends ArrayAdapter<Book> {
         Book currentBook = bookList.get(position);
 
         TextView tvDate = (TextView) listItem.findViewById(R.id.tvDate);
-        tvDate.setText(currentBook.bookDate);
+        //tvDate.setText(currentBook.bookDate);
+        tvDate.setText(currentBook.bookDateNice());
 
         TextView tvName = (TextView) listItem.findViewById(R.id.tvName);
         tvName.setText(currentBook.bookName);

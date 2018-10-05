@@ -14,6 +14,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.ParseException;
+
 public class ViewBook extends AppCompatActivity implements View.OnClickListener {
 
     Button btnOK, btnEdit, btnDelete;
@@ -55,7 +57,8 @@ public class ViewBook extends AppCompatActivity implements View.OnClickListener 
         selectedBook.getDetailsFromIntent(intent);
         Log.d("myLogs","View: OnCreate: " + selectedBook.toString());
 
-        tvDate.setText(selectedBook.bookDate);
+        tvDate.setText(selectedBook.bookDateNice());
+        //tvDate.setText(selectedBook.bookDate);
         tvName.setText(selectedBook.bookName);
         tvAuthor.setText(selectedBook.bookAuthor);
         tvGenre.setText(selectedBook.bookGenre);
@@ -102,7 +105,7 @@ public class ViewBook extends AppCompatActivity implements View.OnClickListener 
                 case INTENT_CODE_EDIT:    // edit book activity
                     selectedBook.getDetailsFromIntent(data);
 
-                    tvDate.setText(selectedBook.bookDate);
+                    tvDate.setText(selectedBook.bookDateNice());
                     tvName.setText(selectedBook.bookName);
                     tvAuthor.setText(selectedBook.bookAuthor);
                     tvGenre.setText(selectedBook.bookGenre);

@@ -12,14 +12,15 @@
          <TextView
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
+
               android:text="Date"/>
-         <EditText
-             android:id="@+id/etDate"
+         <TextView
+             android:id="@+id/tvDate"
              android:layout_width="match_parent"
-             android:layout_height="wrap_content">
-                <requestFocus>
-                </requestFocus>
-         </EditText>
+             android:layout_height="wrap_content"
+             android:textSize="20sp"
+             android:layout_marginBottom="10dp">
+         </TextView>
 
          <TextView
                android:layout_width="match_parent"

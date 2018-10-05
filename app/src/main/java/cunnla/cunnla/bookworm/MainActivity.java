@@ -145,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
                 case INTENT_CODE_EDIT:    // edit book activity
                     selectedBook.getDetailsFromIntent(data);
+                    Log.d("myLogs", "Book data in main activity after edit: "+selectedBook.toString());
                     db.update("bookTable", selectedBook.addBookToCV(),"id = " + selectedBook.id, null);
                     showAllBooks();
                     break;
