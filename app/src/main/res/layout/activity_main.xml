@@ -5,14 +5,47 @@
     android:layout_height="fill_parent"
     android:orientation="vertical">
 
-
-    <Button
-        android:id="@+id/btnAdd"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="Add Book">
-    </Button>
+        android:gravity="right"
+        android:orientation="horizontal">
+
+       <Button
+            android:id="@+id/btnAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="10dp"
+            android:text="Add Book">
+       </Button>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Spinner
+            android:id="@+id/spSort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/sort_array"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginBottom="20dp"
+            android:layout_weight="1"/>
+
+        <Spinner
+            android:id="@+id/spShowGenre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/showGenre_array"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="20dp"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
 
     <TextView
         android:layout_width="fill_parent"

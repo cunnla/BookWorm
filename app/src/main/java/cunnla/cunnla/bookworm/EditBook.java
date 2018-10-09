@@ -2,27 +2,38 @@ package cunnla.cunnla.bookworm;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
-public class EditBook extends AppCompatActivity implements View.OnClickListener {
+public class EditBook extends AppCompatActivity implements View.OnClickListener,  AdapterView.OnItemSelectedListener {
 
     Button btnOK, btnCancel;
-    EditText etName, etAuthor, etGenre, etNotes;
+    EditText etName, etAuthor, etNotes;
+
+    Spinner spGenre;
+    String strGenre;
 
     TextView tvDate;
     Date theDate;
@@ -48,8 +59,47 @@ public class EditBook extends AppCompatActivity implements View.OnClickListener 
 
         etName = (EditText)findViewById(R.id.etName);
         etAuthor = (EditText)findViewById(R.id.etAuthor);
-        etGenre = (EditText)findViewById(R.id.etGenre);
         etNotes = (EditText)findViewById(R.id.etNotes);
+
+        spGenre = (Spinner) findViewById(R.id.spGenre);
+        spGenre.setOnItemSelectedListener(this);
+
+        final List<String> genreList = Arrays.asList(getResources().getStringArray(R.array.genre_array));
+        final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
+                this,android.R.layout.simple_list_item_1,genreList){
+
+            @Override
+            public boolean isEnabled(int position){
+                if(position == 0)
+                {
+                    // Disable the first item from Spinner
+                    // First item will be use for hint
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+
+            @Override
+            public View getDropDownView(int position, View convertView,
+                                        ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView tv = (TextView) view;
+                if(position == 0){
+                    // Set the hint text color gray
+                    tv.setTextColor(Color.GRAY);
+                }
+                else {
+                    tv.setTextColor(Color.BLACK);
+                }
+                return view;
+            }
+
+        };
+
+        spGenre.setAdapter(spinnerArrayAdapter);
 
         intent = getIntent();
 
@@ -59,7 +109,7 @@ public class EditBook extends AppCompatActivity implements View.OnClickListener 
         tvDate.setText(selectedBook.bookDateNice());
         etName.setText(selectedBook.bookName);
         etAuthor.setText(selectedBook.bookAuthor);
-        etGenre.setText(selectedBook.bookGenre);
+        spGenre.setSelection(genreList.indexOf(selectedBook.bookGenre));
         etNotes.setText(selectedBook.bookNotes);
 
         dateString = selectedBook.bookDate;
@@ -75,7 +125,7 @@ public class EditBook extends AppCompatActivity implements View.OnClickListener 
                     selectedBook.bookDate = dateString;
                     selectedBook.bookName = etName.getText().toString();
                     selectedBook.bookAuthor = etAuthor.getText().toString();
-                    selectedBook.bookGenre = etGenre.getText().toString();
+                    selectedBook.bookGenre = strGenre;
                     selectedBook.bookNotes = etNotes.getText().toString();
 
                     intent = new Intent();
@@ -97,6 +147,24 @@ public class EditBook extends AppCompatActivity implements View.OnClickListener 
         }
 
     }
+
+
+    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+        if(pos > 0){
+            strGenre = parent.getItemAtPosition(pos).toString();
+        } else {
+            strGenre = selectedBook.bookGenre;
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> arg0) {
+
+    }
+
+
+    //////////////////
+
 
     public String setDateString(){
 

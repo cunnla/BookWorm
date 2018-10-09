@@ -1,3 +1,42 @@
 <resources>
     <string name="app_name">BookWorm</string>
+
+    <string-array name="genre_array">
+        <item>Select Genre...</item>
+        <item>Drama</item>
+        <item>Science Fiction</item>
+        <item>Fantasy</item>
+        <item>Detective Fiction</item>
+        <item>Poetry</item>
+        <item>Folklore and Mythology</item>
+        <item>Historical Fiction</item>
+        <item>Horror and Mystery</item>
+        <item>Humor</item>
+        <item>Non-Fiction and Documentary</item>
+    </string-array>
+
+    <string-array name="showGenre_array">
+        <item>All Genres</item>
+        <item>Drama</item>
+        <item>Science Fiction</item>
+        <item>Fantasy</item>
+        <item>Detective Fiction</item>
+        <item>Poetry</item>
+        <item>Folklore</item>
+        <item>Historical Fiction</item>
+        <item>Horror and Mystery</item>
+        <item>Humor</item>
+        <item>Non-Fiction</item>
+    </string-array>
+
+    <string-array name="sort_array">
+        <item>Sort by date</item>
+        <item>Sort by name</item>
+        <item>Sort by author</item>
+        <item>Sort by genre</item>
+        <item>Sort by notes</item>
+    </string-array>
+
+
+
 </resources>

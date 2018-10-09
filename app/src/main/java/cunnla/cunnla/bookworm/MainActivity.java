@@ -17,13 +17,20 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
+import static android.widget.Toast.LENGTH_LONG;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener  {
 
     Button btnAdd;
+    Spinner spSort, spShowGenre;
+    String orderBy = "bookDate";
+    String[] strShowGenre = null;
+    String strSelection = null;
 
     DBHelper dbHelper;
     SQLiteDatabase db;
@@ -49,6 +56,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnAdd = (Button)findViewById(R.id.btnAdd);
         btnAdd.setOnClickListener(this);
 
+        spSort = (Spinner) findViewById(R.id.spSort);
+        spSort.setOnItemSelectedListener(this);
+        spShowGenre = (Spinner) findViewById(R.id.spShowGenre);
+        spShowGenre.setOnItemSelectedListener(this);
+
         listBooks = (ListView) findViewById(R.id.listBooks);
         listBooks.setOnItemClickListener(this);
         registerForContextMenu(listBooks);
@@ -56,20 +68,142 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         dbHelper = new DBHelper(this);
 
         selectedBook = new Book();
+
+        orderBy = "bookDate";
+        strShowGenre = null;
+        strSelection = null;
         showAllBooks();
+
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+         Log.d(LOG_TAG, "itemClick: position = " + position + ", id = " + id);
+         selectedBook = (Book) parent.getAdapter().getItem(position);  // getting our object Book from position in ListView
+         intent = new Intent(this, ViewBook.class);
+         selectedBook.putDetailsToIntent(intent);
+         startActivityForResult(intent, INTENT_CODE_VIEW);
+    }
+
+    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+        Log.d("myLogs", "Got to onItemSelected");
+
+        switch (parent.getId()) {
+            case R.id.spSort:
+                Log.d("myLogs", "Got to the sorting selection");
+                         switch (pos) {
+                             case 0:
+                                orderBy = "bookDate";
+                                 showAllBooks();
+                                 break;
+                             case 1:
+                                 orderBy = "bookName";
+                                 showAllBooks();
+                                 break;
+                             case 2:
+                                orderBy = "bookAuthor";
+                                showAllBooks();
+                                break;
+                             case 3:
+                                orderBy = "bookGenre";
+                                showAllBooks();
+                                break;
+                             case 4:
+                                orderBy = "bookNotes";
+                                showAllBooks();
+                                break;
+                             default:
+                                orderBy = "bookDate";
+                                showAllBooks();
+                                break;
+                         }
+            break;
+
+            case R.id.spShowGenre:
+                Log.d("myLogs", "Got to the genre selection");
+                switch (pos) {
+                    case 0:
+                        strSelection = null;
+                        strShowGenre = null;
+                        showAllBooks();
+                        break;
+                    case 1:
+                        Log.d("myLogs", strSelection+" "+strShowGenre);
+                        strSelection = "bookGenre = ?";
+                        strShowGenre = new String[] {"Drama"};
+                        showAllBooks();
+                        break;
+                    case 2:
+                        Log.d("myLogs", strSelection+" "+strShowGenre);
+                        strSelection = "bookGenre = ?";
+                        strShowGenre = new String[] {"Science Fiction"};
+                        showAllBooks();
+                        break;
+                    case 3:
+                        Log.d("myLogs", strSelection+" "+strShowGenre);
+                        strSelection = "bookGenre = ?";
+                        strShowGenre = new String[] {"Fantasy"};
+                        showAllBooks();
+                        break;
+                    case 4:
+                        Log.d("myLogs", strSelection+" "+strShowGenre);
+                        strSelection = "bookGenre = ?";
+                        strShowGenre = new String[] {"Detective Fiction"};
+                        showAllBooks();
+                        break;
+                    case 5:
+                        Log.d("myLogs", strSelection+" "+strShowGenre);
+                        strSelection = "bookGenre = ?";
+                        strShowGenre = new String[] {"Poetry"};
+                        showAllBooks();
+                        break;
+                    case 6:
+                        Log.d("myLogs", strSelection+" "+strShowGenre);
+                        strSelection = "bookGenre = ?";
+                        strShowGenre = new String[] {"Folklore and Mythology"};
+                        showAllBooks();
+                        break;
+                    case 7:
+                        Log.d("myLogs", strSelection+" "+strShowGenre);
+                        strSelection = "bookGenre = ?";
+                        strShowGenre = new String[] {"Historical Fiction"};
+                        showAllBooks();
+                        break;
+                    case 8:
+                        Log.d("myLogs", strSelection+" "+strShowGenre);
+                        strSelection = "bookGenre = ?";
+                        strShowGenre = new String[] {"Horror and Mystery"};
+                        showAllBooks();
+                        break;
+                    case 9:
+                        Log.d("myLogs", strSelection+" "+strShowGenre);
+                        strSelection = "bookGenre = ?";
+                        strShowGenre = new String[] {"Humor"};
+                        showAllBooks();
+                        break;
+                    case 10:
+                        Log.d("myLogs", strSelection+" "+strShowGenre);
+                        strSelection = "bookGenre = ?";
+                        strShowGenre = new String[] {"Non-Fiction and Documentary"};
+                        showAllBooks();
+                        break;
+                    default:
+                        strSelection = null;
+                        strShowGenre = null;
+                        showAllBooks();
+                        break;
+                }
+             break;
+
+
+        }
 
 
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Log.d(LOG_TAG, "itemClick: position = " + position + ", id = " + id);
+    public void onNothingSelected(AdapterView<?> arg0) {
 
-        selectedBook = (Book)parent.getAdapter().getItem(position);  // getting our object Book from position in ListView
-
-        intent = new Intent(this, ViewBook.class);
-        selectedBook.putDetailsToIntent(intent);
-        startActivityForResult(intent, INTENT_CODE_VIEW);
     }
 
     @Override
@@ -167,7 +301,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void showAllBooks(){
 
         db = dbHelper.getWritableDatabase();
-        Cursor cursor = db.query("bookTable", null, null, null, null, null, null);
+        Cursor cursor = db.query("bookTable", null, strSelection, strShowGenre, null, null, orderBy);
         ArrayList<Book> booksList = new ArrayList<>();
 
         if (cursor.moveToFirst()) {
