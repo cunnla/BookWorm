@@ -21,6 +21,8 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static android.widget.Toast.LENGTH_LONG;
 
@@ -47,19 +49,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     final String LOG_TAG = "myLogs";
 
+    Utils utils;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        utils = new Utils();
+
         btnAdd = (Button)findViewById(R.id.btnAdd);
         btnAdd.setOnClickListener(this);
 
         spSort = (Spinner) findViewById(R.id.spSort);
         spSort.setOnItemSelectedListener(this);
+
         spShowGenre = (Spinner) findViewById(R.id.spShowGenre);
         spShowGenre.setOnItemSelectedListener(this);
+        ArrayList<String> listGenre = new ArrayList<String>(Arrays.asList(getResources().getStringArray(utils.GENRE_ARRAY)));
+        ArrayAdapter<String> listGenreAdapter = new ArrayAdapter<String>(this, utils.SPINNER_LAYOUT, listGenre);
+        listGenreAdapter.remove(listGenreAdapter.getItem(0));
+        spShowGenre.setAdapter(listGenreAdapter);
+
 
         listBooks = (ListView) findViewById(R.id.listBooks);
         listBooks.setOnItemClickListener(this);
@@ -105,10 +117,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 showAllBooks();
                                 break;
                              case 3:
-                                orderBy = "bookGenre";
-                                showAllBooks();
-                                break;
-                             case 4:
                                 orderBy = "bookNotes";
                                 showAllBooks();
                                 break;
@@ -121,83 +129,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.spShowGenre:
                 Log.d("myLogs", "Got to the genre selection");
-                switch (pos) {
-                    case 0:
-                        strSelection = null;
-                        strShowGenre = null;
-                        showAllBooks();
-                        break;
-                    case 1:
-                        Log.d("myLogs", strSelection+" "+strShowGenre);
-                        strSelection = "bookGenre = ?";
-                        strShowGenre = new String[] {"Drama"};
-                        showAllBooks();
-                        break;
-                    case 2:
-                        Log.d("myLogs", strSelection+" "+strShowGenre);
-                        strSelection = "bookGenre = ?";
-                        strShowGenre = new String[] {"Science Fiction"};
-                        showAllBooks();
-                        break;
-                    case 3:
-                        Log.d("myLogs", strSelection+" "+strShowGenre);
-                        strSelection = "bookGenre = ?";
-                        strShowGenre = new String[] {"Fantasy"};
-                        showAllBooks();
-                        break;
-                    case 4:
-                        Log.d("myLogs", strSelection+" "+strShowGenre);
-                        strSelection = "bookGenre = ?";
-                        strShowGenre = new String[] {"Detective Fiction"};
-                        showAllBooks();
-                        break;
-                    case 5:
-                        Log.d("myLogs", strSelection+" "+strShowGenre);
-                        strSelection = "bookGenre = ?";
-                        strShowGenre = new String[] {"Poetry"};
-                        showAllBooks();
-                        break;
-                    case 6:
-                        Log.d("myLogs", strSelection+" "+strShowGenre);
-                        strSelection = "bookGenre = ?";
-                        strShowGenre = new String[] {"Folklore and Mythology"};
-                        showAllBooks();
-                        break;
-                    case 7:
-                        Log.d("myLogs", strSelection+" "+strShowGenre);
-                        strSelection = "bookGenre = ?";
-                        strShowGenre = new String[] {"Historical Fiction"};
-                        showAllBooks();
-                        break;
-                    case 8:
-                        Log.d("myLogs", strSelection+" "+strShowGenre);
-                        strSelection = "bookGenre = ?";
-                        strShowGenre = new String[] {"Horror and Mystery"};
-                        showAllBooks();
-                        break;
-                    case 9:
-                        Log.d("myLogs", strSelection+" "+strShowGenre);
-                        strSelection = "bookGenre = ?";
-                        strShowGenre = new String[] {"Humor"};
-                        showAllBooks();
-                        break;
-                    case 10:
-                        Log.d("myLogs", strSelection+" "+strShowGenre);
-                        strSelection = "bookGenre = ?";
-                        strShowGenre = new String[] {"Non-Fiction and Documentary"};
-                        showAllBooks();
-                        break;
-                    default:
-                        strSelection = null;
-                        strShowGenre = null;
-                        showAllBooks();
-                        break;
+                if (pos==0) {
+                    strSelection = null;
+                    strShowGenre = null;
+                } else {
+                    strSelection = "bookGenre = ?";
+                    strShowGenre = new String[]{parent.getAdapter().getItem(pos).toString()};
+                    Log.d("myLogs", "strShowGenre: "+strShowGenre[0]);
                 }
-             break;
 
+                showAllBooks();
+                break;
 
         }
-
 
     }
 

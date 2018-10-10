@@ -27,17 +27,16 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-public class EditBook extends AppCompatActivity implements View.OnClickListener,  AdapterView.OnItemSelectedListener {
+public class EditBook extends AppCompatActivity implements View.OnClickListener,  AdapterView.OnItemSelectedListener, utilsCallBack {
 
     Button btnOK, btnCancel;
     EditText etName, etAuthor, etNotes;
 
+    Utils utils; // my own class for my own different util methods
     Spinner spGenre;
     String strGenre;
 
-    TextView tvDate;
-    Date theDate;
-    String dateString;
+    static TextView tvDate;  //static - in order to be able to access it from Utils class
 
     Intent intent;
 
@@ -48,6 +47,9 @@ public class EditBook extends AppCompatActivity implements View.OnClickListener,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_book);
 
+        utils = new Utils(this);
+
+
         btnOK = (Button) findViewById(R.id.btnOk);
         btnOK.setOnClickListener(this);
         btnCancel = (Button) findViewById(R.id.btnCancel);
@@ -57,49 +59,14 @@ public class EditBook extends AppCompatActivity implements View.OnClickListener,
         tvDate.setOnClickListener(this);
 
 
+
         etName = (EditText)findViewById(R.id.etName);
         etAuthor = (EditText)findViewById(R.id.etAuthor);
         etNotes = (EditText)findViewById(R.id.etNotes);
 
         spGenre = (Spinner) findViewById(R.id.spGenre);
         spGenre.setOnItemSelectedListener(this);
-
-        final List<String> genreList = Arrays.asList(getResources().getStringArray(R.array.genre_array));
-        final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
-                this,android.R.layout.simple_list_item_1,genreList){
-
-            @Override
-            public boolean isEnabled(int position){
-                if(position == 0)
-                {
-                    // Disable the first item from Spinner
-                    // First item will be use for hint
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-
-            @Override
-            public View getDropDownView(int position, View convertView,
-                                        ViewGroup parent) {
-                View view = super.getDropDownView(position, convertView, parent);
-                TextView tv = (TextView) view;
-                if(position == 0){
-                    // Set the hint text color gray
-                    tv.setTextColor(Color.GRAY);
-                }
-                else {
-                    tv.setTextColor(Color.BLACK);
-                }
-                return view;
-            }
-
-        };
-
-        spGenre.setAdapter(spinnerArrayAdapter);
+        utils.showGenreSpinner(this, spGenre);
 
         intent = getIntent();
 
@@ -109,11 +76,15 @@ public class EditBook extends AppCompatActivity implements View.OnClickListener,
         tvDate.setText(selectedBook.bookDateNice());
         etName.setText(selectedBook.bookName);
         etAuthor.setText(selectedBook.bookAuthor);
-        spGenre.setSelection(genreList.indexOf(selectedBook.bookGenre));
+        spGenre.setSelection(utils.genreList.indexOf(selectedBook.bookGenre));
         etNotes.setText(selectedBook.bookNotes);
 
-        dateString = selectedBook.bookDate;
+        utils.dateString = selectedBook.bookDate;
 
+    }
+
+    public void updateTextView(String mystr){  //this is for the callback interface
+         tvDate.setText(mystr);
     }
 
     @Override
@@ -122,7 +93,7 @@ public class EditBook extends AppCompatActivity implements View.OnClickListener,
         switch (v.getId()) {
             case R.id.btnOk:
                 if (!etName.getText().toString().equalsIgnoreCase("") ) {              // if a name is entered
-                    selectedBook.bookDate = dateString;
+                    selectedBook.bookDate = utils.dateString;
                     selectedBook.bookName = etName.getText().toString();
                     selectedBook.bookAuthor = etAuthor.getText().toString();
                     selectedBook.bookGenre = strGenre;
@@ -142,7 +113,7 @@ public class EditBook extends AppCompatActivity implements View.OnClickListener,
                 finish();
                 break;
             case R.id.tvDate:
-                dateString = setDateString();
+                utils.dateString = utils.setDateString(this);
                 break;
         }
 
@@ -163,49 +134,7 @@ public class EditBook extends AppCompatActivity implements View.OnClickListener,
     }
 
 
-    //////////////////
 
 
-    public String setDateString(){
 
-        Calendar myCalendar= Calendar.getInstance();
-
-        //////////////////
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        theDate = new Date();
-
-        try {
-            if (dateString!=null) {
-                theDate = df.parse(dateString);
-            }
-        } catch (ParseException e) {
-            //Handle exception here, most of the time you will just log it.
-            e.printStackTrace();
-        }
-
-        myCalendar.setTime(theDate);
-        /////////////////
-
-        int year=myCalendar.get(Calendar.YEAR);
-        int month=myCalendar.get(Calendar.MONTH);
-        int day=myCalendar.get(Calendar.DAY_OF_MONTH);
-
-        DatePickerDialog.OnDateSetListener datePickerDialogListener = new DatePickerDialog.OnDateSetListener() {
-            public void onDateSet(DatePicker view, int year, int month, int day){
-                month++;   //because in Android month starts from 0
-                String sMonth = Integer.toString(month); // this is to make the string look like YYYY-MM-DD HH:mm:SS
-                String sDay = Integer.toString(day);     // which is the mysql date format
-                if (month<10) {sMonth = "0"+month;}
-                if (day<10) {sDay = "0"+day;}
-                dateString = (year+"-"+sMonth+"-"+sDay+" 00:00:00");
-                Log.d("myLogs", "dateString: "+ dateString);
-                tvDate.setText(sDay+"."+sMonth+"."+year);
-            }
-        };
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, datePickerDialogListener, year, month, day);
-        datePickerDialog.show();
-
-        return dateString;
-
-    }
 }

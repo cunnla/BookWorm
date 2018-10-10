@@ -16,6 +16,7 @@ import java.util.List;
 
 public class BookAdapter extends ArrayAdapter<Book> {
 
+
     private Context mContext;
     private List <Book> bookList = new ArrayList<>();
 
