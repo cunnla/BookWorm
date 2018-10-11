@@ -3,23 +3,27 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:layout_margin="10dp"
-    android:orientation="vertical">
+
+    android:orientation="vertical"
+    android:background="@color/colorPrimaryLight">
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="10dp"
         android:orientation="vertical">
         <TextView
             android:layout_width="match_parent"
-           android:layout_height="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorAccent"
            android:text="Date"/>
         <TextView
             android:id="@+id/tvDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="17sp"
-            android:textColor="@color/colorPrimaryDark"
             android:layout_marginTop="5dp"
             android:layout_marginLeft="10dp"
             android:layout_marginBottom="20dp">
@@ -28,13 +32,15 @@
        <TextView
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
+           android:textSize="20sp"
+           android:textStyle="bold"
+           android:textColor="@color/colorAccent"
            android:text="Name"/>
        <EditText
           android:id="@+id/etName"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:textSize="17sp"
-          android:textColor="@color/colorPrimaryDark"
           android:layout_marginLeft="10dp"
           android:layout_marginBottom="20dp">
         </EditText>
@@ -42,13 +48,15 @@
        <TextView
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
+           android:textSize="20sp"
+           android:textStyle="bold"
+           android:textColor="@color/colorAccent"
            android:text="Author"/>
        <EditText
           android:id="@+id/etAuthor"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:textSize="17sp"
-          android:textColor="@color/colorPrimaryDark"
           android:layout_marginLeft="10dp"
           android:layout_marginBottom="20dp">
        </EditText>
@@ -56,33 +64,38 @@
        <TextView
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
+           android:textSize="20sp"
+           android:textStyle="bold"
+           android:textColor="@color/colorAccent"
            android:text="Genre"/>
         <Spinner
             android:id="@+id/spGenre"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:entries="@array/genre_array"
+            android:popupBackground="@color/colorPrimaryDark"
             android:layout_marginBottom="20dp"/>
 
        <TextView
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
+           android:textSize="20sp"
+           android:textStyle="bold"
+           android:textColor="@color/colorAccent"
            android:text="Notes"/>
         <ScrollView
             android:id="@+id/scroller"
             android:layout_width="fill_parent"
-            android:layout_height="120dp"
+            android:layout_height="90dp"
             android:scrollbars="vertical"
             android:fillViewport="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginBottom="20dp">
+            android:layout_marginLeft="10dp">
             <EditText
                 android:id="@+id/etNotes"
                 android:gravity="top"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:textSize="17sp"
-                android:textColor="@color/colorPrimaryDark">
+                android:textSize="17sp">
             </EditText>
         </ScrollView>
     </LinearLayout>
@@ -91,20 +104,25 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_margin="10dp"
         android:orientation="horizontal">
         <Button
             android:id="@+id/btnOk"
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:background="@color/colorAccent"
+            android:textColor="@color/colorPrimaryLight"
+            android:layout_marginRight="40dp"
             android:text="OK">
         </Button>
         <Button
             android:id="@+id/btnCancel"
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:background="@color/colorRed"
+            android:layout_marginLeft="40dp"
             android:text="Cancel">
         </Button>
     </LinearLayout>

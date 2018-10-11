@@ -1,6 +1,7 @@
 package cunnla.cunnla.bookworm;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,15 +17,18 @@ import java.util.List;
 
 public class BookAdapter extends ArrayAdapter<Book> {
 
-
     private Context mContext;
     private List <Book> bookList = new ArrayList<>();
+    int[] colors = new int[2];
 
     public BookAdapter(@NonNull Context context, int resource, @NonNull ArrayList<Book> list) {
         super(context, 0, list);
 
         mContext = context;
         bookList = list;
+
+        colors[0] = mContext.getResources().getColor(R.color.colorPrimary);
+        colors[1] = mContext.getResources().getColor(R.color.colorPrimaryLight);
 
     }
 
@@ -36,6 +40,8 @@ public class BookAdapter extends ArrayAdapter<Book> {
             listItem = LayoutInflater.from(mContext).inflate(R.layout.list_book,parent,false);
 
         Book currentBook = bookList.get(position);
+
+        listItem.setBackgroundColor(colors[position % 2]);
 
         TextView tvDate = (TextView) listItem.findViewById(R.id.tvDate);
         //tvDate.setText(currentBook.bookDate);

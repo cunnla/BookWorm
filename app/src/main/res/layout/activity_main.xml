@@ -3,12 +3,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/colorPrimaryLight">
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
+        android:background="@color/colorAccent"
         android:orientation="horizontal">
 
         <TextView
@@ -16,8 +18,10 @@
             android:layout_height="wrap_content"
             android:textSize="20sp"
             android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
             android:layout_marginLeft="15dp"
             android:textStyle="bold"
+            android:textColor="@color/colorPrimaryLight"
             android:text="List of Books"
             android:layout_weight="1">
         </TextView>
@@ -26,7 +30,8 @@
             android:id="@+id/btnAdd"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:layout_marginRight="10dp"
             android:text="Add Book"
             android:layout_weight="1">
@@ -39,25 +44,28 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:background="@color/colorPrimaryVeryDark">
         <Spinner
             android:id="@+id/spSort"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:popupBackground="@color/colorAccentLight"
             android:entries="@array/sort_array"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="5dp"
             android:layout_marginLeft="10dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="5dp"
             android:layout_weight="1"/>
 
         <Spinner
             android:id="@+id/spShowGenre"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:popupBackground="@color/colorAccentLight"
             android:entries="@array/genre_array"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="5dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="5dp"
             android:layout_weight="1"/>
 
     </LinearLayout>

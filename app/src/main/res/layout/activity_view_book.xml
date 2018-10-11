@@ -3,19 +3,21 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:layout_margin="10dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/colorPrimaryLight">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_margin="10dp"
         android:gravity="center">
         <Button
             android:id="@+id/btnEdit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
+            android:background="@color/colorPrimaryVeryDark"
             android:text="Edit">
         </Button>
 
@@ -24,16 +26,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
+            android:background="@color/colorRed"
             android:text="Delete">
         </Button>
     </LinearLayout>
 
-
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="10dp">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:textStyle="bold"
+        android:textColor="@color/colorAccent"
         android:text="Date:"/>
     <TextView
         android:id="@+id/tvDate"
@@ -47,6 +55,7 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:textStyle="bold"
+        android:textColor="@color/colorAccent"
         android:text="Name:"/>
     <TextView
         android:id="@+id/tvName"
@@ -60,6 +69,7 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:textStyle="bold"
+        android:textColor="@color/colorAccent"
         android:text="Author:"/>
     <TextView
         android:id="@+id/tvAuthor"
@@ -73,6 +83,7 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:textStyle="bold"
+        android:textColor="@color/colorAccent"
         android:text="Genre:"/>
     <TextView
         android:id="@+id/tvGenre"
@@ -86,6 +97,7 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:textStyle="bold"
+        android:textColor="@color/colorAccent"
         android:text="Notes:"/>
     <ScrollView
         android:id="@+id/SCROLLER_ID"
@@ -100,6 +112,7 @@
            android:layout_marginBottom="20dp">
        </TextView>
     </ScrollView>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -112,6 +125,8 @@
             android:id="@+id/btnOk"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
+            android:background="@color/colorAccent"
+            android:textColor="@color/colorPrimaryLight"
             android:text="Go Back">
         </Button>
     </LinearLayout>

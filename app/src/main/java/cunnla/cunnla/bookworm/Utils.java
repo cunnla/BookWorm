@@ -24,7 +24,7 @@ public class Utils {
 
     //final static int SORT_ARRAY = R.array.;  //does not exist so far, I may need to create it later
     final static int GENRE_ARRAY = R.array.genre_array;
-    final static int SPINNER_LAYOUT = android.R.layout.simple_list_item_1;
+    final static int SPINNER_LAYOUT = R.layout.list_spinner;
 
     ArrayList<String> genreList;
 
