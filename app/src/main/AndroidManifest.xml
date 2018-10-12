@@ -17,12 +17,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".AddBook"
-            android:windowSoftInputMode="adjustPan"/>
-
         <activity android:name=".ViewBook" />
 
-        <activity android:name=".EditBook"
+        <activity android:name=".AddEditBook"
             android:windowSoftInputMode="adjustPan"/>
 
         <activity android:name=".DeleteBook"

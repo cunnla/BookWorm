@@ -1,20 +1,14 @@
 package cunnla.cunnla.bookworm;
 
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.text.ParseException;
 
 public class ViewBook extends AppCompatActivity implements View.OnClickListener {
 
@@ -75,7 +69,7 @@ public class ViewBook extends AppCompatActivity implements View.OnClickListener 
 
         switch (v.getId()) {
             case R.id.btnEdit:
-                intent2 = new Intent(this, EditBook.class);
+                intent2 = new Intent(this, AddEditBook.class);
                 selectedBook.putDetailsToIntent(intent2);
                 startActivityForResult(intent2, INTENT_CODE_EDIT);
                 break;

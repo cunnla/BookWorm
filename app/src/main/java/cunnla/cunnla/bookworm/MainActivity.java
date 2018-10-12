@@ -1,11 +1,8 @@
 package cunnla.cunnla.bookworm;
 
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,7 +10,6 @@ import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -22,15 +18,12 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-
-import static android.widget.Toast.LENGTH_LONG;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener  {
 
     Button btnAdd;
     Spinner spSort, spShowGenre;
-    String orderBy = "bookDate";
+    String orderBy = "bookDate DESC";
     String[] strShowGenre = null;
     String strSelection = null;
 
@@ -41,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Book selectedBook;
 
     Intent intent;
+
     final static int INTENT_CODE_ADD = 1;
     final static int INTENT_CODE_VIEW = 2;
     final static int INTENT_CODE_EDIT = 3;
@@ -49,15 +43,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     final String LOG_TAG = "myLogs";
 
-    Utils utils;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        utils = new Utils();
 
         btnAdd = (Button)findViewById(R.id.btnAdd);
         btnAdd.setOnClickListener(this);
@@ -67,8 +57,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         spShowGenre = (Spinner) findViewById(R.id.spShowGenre);
         spShowGenre.setOnItemSelectedListener(this);
-        ArrayList<String> listGenre = new ArrayList<String>(Arrays.asList(getResources().getStringArray(utils.GENRE_ARRAY)));
-        ArrayAdapter<String> listGenreAdapter = new ArrayAdapter<String>(this, utils.SPINNER_LAYOUT, listGenre);
+        ArrayList<String> listGenre = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.genre_array)));
+        ArrayAdapter<String> listGenreAdapter = new ArrayAdapter<String>(this, R.layout.list_spinner, listGenre);
         listGenreAdapter.remove(listGenreAdapter.getItem(0));
         spShowGenre.setAdapter(listGenreAdapter);
 
@@ -81,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         selectedBook = new Book();
 
-        orderBy = "bookDate";
+        orderBy = "bookDate DESC";
         strShowGenre = null;
         strSelection = null;
         showAllBooks();
@@ -105,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.d("myLogs", "Got to the sorting selection");
                          switch (pos) {
                              case 0:
-                                orderBy = "bookDate";
+                                orderBy = "bookDate DESC";
                                  showAllBooks();
                                  break;
                              case 1:
@@ -121,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 showAllBooks();
                                 break;
                              default:
-                                orderBy = "bookDate";
+                                orderBy = "bookDate DESC";
                                 showAllBooks();
                                 break;
                          }
@@ -179,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case 2:  // edit
                 Log.d("myLogs","Main activity: Edit: " + selectedBook.toString());
-                intent = new Intent(this, EditBook.class);
+                intent = new Intent(this, AddEditBook.class);
                 selectedBook.putDetailsToIntent(intent);
                 startActivityForResult(intent, INTENT_CODE_EDIT);
                 break;
@@ -196,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btnAdd:
-            intent = new Intent(this, AddBook.class);
+            intent = new Intent(this, AddEditBook.class);
             startActivityForResult(intent, INTENT_CODE_ADD);
             break;
         }
@@ -267,6 +257,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         BookAdapter bookAdapter = new BookAdapter(this, 0, booksList);
         listBooks.setAdapter(bookAdapter);
     }
+
+
 
 
 
