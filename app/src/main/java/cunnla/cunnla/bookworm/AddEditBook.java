@@ -29,6 +29,7 @@ public class AddEditBook extends AppCompatActivity implements View.OnClickListen
 
     Button btnOK, btnCancel;
     EditText etName, etAuthor, etNotes;
+    TextView tvDate;
 
     Spinner spGenre;
     String strGenre;
@@ -36,8 +37,6 @@ public class AddEditBook extends AppCompatActivity implements View.OnClickListen
 
     Date theDate;
     String dateString;
-
-    static TextView tvDate;  //static - in order to be able to access it from Utils class
 
     Intent intent;
 
@@ -58,7 +57,6 @@ public class AddEditBook extends AppCompatActivity implements View.OnClickListen
         tvDate.setOnClickListener(this);
 
 
-
         etName = (EditText)findViewById(R.id.etName);
         etAuthor = (EditText)findViewById(R.id.etAuthor);
         etNotes = (EditText)findViewById(R.id.etNotes);
@@ -67,10 +65,11 @@ public class AddEditBook extends AppCompatActivity implements View.OnClickListen
         spGenre.setOnItemSelectedListener(this);
         showGenreSpinner();
 
-        intent = getIntent();
 
+        intent = getIntent();
         selectedBook = new Book();
         selectedBook.getDetailsFromIntent(intent);
+
 
         tvDate.setText(selectedBook.bookDateNice());
         etName.setText(selectedBook.bookName);
@@ -78,13 +77,12 @@ public class AddEditBook extends AppCompatActivity implements View.OnClickListen
         spGenre.setSelection(genreList.indexOf(selectedBook.bookGenre));
         etNotes.setText(selectedBook.bookNotes);
 
-        dateString = selectedBook.bookDate;
+        if (selectedBook.bookDate!=null) {
+            dateString = selectedBook.bookDate;
+        }
 
     }
 
-    public void updateTextView(String mystr){  //this is for the callback interface
-         tvDate.setText(mystr);
-    }
 
     @Override
     public void onClick(View v) {
@@ -183,6 +181,9 @@ public class AddEditBook extends AppCompatActivity implements View.OnClickListen
         try {
             if (dateString!=null) {
                 theDate = df.parse(dateString);
+            } else {
+                Log.d ("myLogs", "date is empty");
+                theDate=Calendar.getInstance().getTime();
             }
         } catch (ParseException e) {
             //Handle exception here, most of the time you will just log it.

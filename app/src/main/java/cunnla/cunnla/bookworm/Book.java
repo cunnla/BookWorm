@@ -18,7 +18,7 @@ import java.util.GregorianCalendar;
 public class Book {
 
     String bookDate, bookName, bookAuthor, bookGenre, bookNotes, id;
-    String dateString = "";
+    //String dateString = "";
 
 
      public Book(){
@@ -62,12 +62,44 @@ public class Book {
      }
 
      public void getDetailsFromIntent(Intent intent){
-         this.bookDate = intent.getStringExtra("bookDate");
-         this.bookName = intent.getStringExtra("bookName");
-         this.bookAuthor = intent.getStringExtra("bookAuthor");
-         this.bookGenre = intent.getStringExtra("bookGenre");
-         this.bookNotes = intent.getStringExtra("bookNotes");
-         this.id = intent.getStringExtra("id");
+
+         if (intent.getStringExtra("bookDate")!=null) {
+             this.bookDate = intent.getStringExtra("bookDate");
+         } else {
+             Calendar myCalendar= Calendar.getInstance();
+             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+             this.bookDate = (df.format(myCalendar.getTime()));
+         }
+
+         if (intent.getStringExtra("bookName")!=null) {
+             this.bookName = intent.getStringExtra("bookName");
+         } else {
+             this.bookName = "";
+         }
+
+         if (intent.getStringExtra("bookAuthor")!=null) {
+             this.bookAuthor = intent.getStringExtra("bookAuthor");
+         } else {
+             this.bookAuthor = "";
+         }
+
+         if (intent.getStringExtra("bookGenre")!=null) {
+             this.bookGenre = intent.getStringExtra("bookGenre");
+         } else {
+             this.bookGenre = "";
+         }
+
+         if (intent.getStringExtra("bookNotes")!=null) {
+             this.bookNotes = intent.getStringExtra("bookNotes");
+         } else {
+             this.bookNotes = "";
+         }
+
+         if (intent.getStringExtra("id")!=null) {
+             this.id = intent.getStringExtra("id");
+         }
+
+         Log.d("myLogs", "Intent: bookdata: "+this.toString());
      }
 
      public String bookDateNice() {
@@ -82,11 +114,10 @@ public class Book {
          Log.d("myLogs", "bookDateNice data: "+this.toString());
 
          try {
-               if (this.bookDate!=null) {
-               theDate = df.parse(this.bookDate);
-              // String strDate = df.format(myCal.getTime());   // checking if the date is correct
-              // Log.d("myLogs", "strDate: "+ strDate);
+               if ((this.bookDate!=null)) {
+                   theDate = df.parse(this.bookDate);
                }
+
 
                myCal.setTime(theDate);
 

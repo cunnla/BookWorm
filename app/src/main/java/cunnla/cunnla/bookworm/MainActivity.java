@@ -3,6 +3,8 @@ package cunnla.cunnla.bookworm;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,7 +31,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     DBHelper dbHelper;
     SQLiteDatabase db;
-    ListView listBooks;
+    ListView booksListView;
+    Handler myHandler;
 
     Book selectedBook;
 
@@ -63,18 +66,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         spShowGenre.setAdapter(listGenreAdapter);
 
 
-        listBooks = (ListView) findViewById(R.id.listBooks);
-        listBooks.setOnItemClickListener(this);
-        registerForContextMenu(listBooks);
+        booksListView = (ListView) findViewById(R.id.listBooks);
+        booksListView.setOnItemClickListener(this);
+        registerForContextMenu(booksListView);
 
         dbHelper = new DBHelper(this);
+      //  dbThread = new DBThread();
 
         selectedBook = new Book();
 
         orderBy = "bookDate DESC";
         strShowGenre = null;
         strSelection = null;
+
         showAllBooks();
+
 
     }
 
@@ -104,15 +110,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                  break;
                              case 2:
                                 orderBy = "bookAuthor";
-                                showAllBooks();
+                                 showAllBooks();
                                 break;
                              case 3:
                                 orderBy = "bookNotes";
-                                showAllBooks();
+                                 showAllBooks();
                                 break;
                              default:
                                 orderBy = "bookDate DESC";
-                                showAllBooks();
+                                 showAllBooks();
                                 break;
                          }
             break;
@@ -205,7 +211,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 case INTENT_CODE_ADD:    // add book activity
                     selectedBook = new Book();
                     selectedBook.getDetailsFromIntent(data);
-                    db.insert("bookTable", null, selectedBook.addBookToCV());
+                    Log.d("myLogs", "Added book:"+selectedBook.toString());
+                    addBook(selectedBook);
                     showAllBooks();
                     break;
                 case INTENT_CODE_VIEW:    // view book activity
@@ -214,11 +221,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 case INTENT_CODE_EDIT:    // edit book activity
                     selectedBook.getDetailsFromIntent(data);
                     Log.d("myLogs", "Book data in main activity after edit: "+selectedBook.toString());
-                    db.update("bookTable", selectedBook.addBookToCV(),"id = " + selectedBook.id, null);
+                    updateBook(selectedBook);
                     showAllBooks();
                     break;
                 case INTENT_CODE_DELETE:    // delete book activity
-                    db.delete("bookTable", "id = " + selectedBook.id, null);
+                    deleteBook(selectedBook);
                     showAllBooks();
                     break;
             }
@@ -232,32 +239,75 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    public void showAllBooks(){
-
-        db = dbHelper.getWritableDatabase();
-        Cursor cursor = db.query("bookTable", null, strSelection, strShowGenre, null, null, orderBy);
-        ArrayList<Book> booksList = new ArrayList<>();
-
-        if (cursor.moveToFirst()) {
-            do{
-                booksList.add( new Book(cursor.getString(cursor.getColumnIndex("bookDate")),
-                        cursor.getString(cursor.getColumnIndex("bookName")),
-                        cursor.getString(cursor.getColumnIndex("bookAuthor")),
-                        cursor.getString(cursor.getColumnIndex("bookGenre")),
-                        cursor.getString(cursor.getColumnIndex("bookNotes")),
-                        cursor.getString(cursor.getColumnIndex("id"))
-                ));
-            }while (cursor.moveToNext());
-        }else
-            Log.d(LOG_TAG, "0 rows");
-
-        cursor.close();
-        dbHelper.close();
-
-        BookAdapter bookAdapter = new BookAdapter(this, 0, booksList);
-        listBooks.setAdapter(bookAdapter);
+    public void addBook(final Book thisBook){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                db = dbHelper.getReadableDatabase();
+                db.insert("bookTable", null, thisBook.addBookToCV());
+                }
+        }).start();
     }
 
+    public void updateBook(final Book thisBook){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                db = dbHelper.getReadableDatabase();
+                db.update("bookTable", thisBook.addBookToCV(),"id = " + thisBook.id, null);
+            }
+        }).start();
+    }
+
+    public void deleteBook(final Book thisBook){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                db = dbHelper.getReadableDatabase();
+                db.delete("bookTable", "id = " + thisBook.id, null);
+            }
+        }).start();
+    }
+
+
+    public void showAllBooks(){
+
+        myHandler = new Handler(){
+            public void handleMessage(android.os.Message msg) {
+                BookAdapter bookAdapter = new BookAdapter(getApplicationContext(), 0, (ArrayList<Book>) msg.obj);
+                booksListView.setAdapter(bookAdapter);
+            }
+        };
+
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ArrayList<Book> booksList = new ArrayList<>();
+                db = dbHelper.getReadableDatabase();
+                Cursor cursor = db.query("bookTable", null, strSelection, strShowGenre, null, null, orderBy);
+                if (cursor.moveToFirst()) {
+                    do{
+                        booksList.add( new Book(cursor.getString(cursor.getColumnIndex("bookDate")),
+                                cursor.getString(cursor.getColumnIndex("bookName")),
+                                cursor.getString(cursor.getColumnIndex("bookAuthor")),
+                                cursor.getString(cursor.getColumnIndex("bookGenre")),
+                                cursor.getString(cursor.getColumnIndex("bookNotes")),
+                                cursor.getString(cursor.getColumnIndex("id"))
+                        ));
+                        Log.d(LOG_TAG, "Adding to books list:"+ cursor.getString(cursor.getColumnIndex("bookName")));
+                    }while (cursor.moveToNext());
+                }else
+                    Log.d(LOG_TAG, "0 rows");
+                cursor.close();
+              //  dbHelper.close();
+                Message message = new Message();
+                message.obj = booksList;
+                myHandler.sendMessage(message);
+                }
+        }).start();
+
+    }
 
 
 

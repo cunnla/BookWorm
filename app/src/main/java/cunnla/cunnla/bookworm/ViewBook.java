@@ -93,7 +93,7 @@ public class ViewBook extends AppCompatActivity implements View.OnClickListener 
 
         if (resultCode == RESULT_OK) {
 
-            db = dbHelper.getWritableDatabase();
+
 
             switch (requestCode) {
                 case INTENT_CODE_EDIT:    // edit book activity
@@ -107,20 +107,47 @@ public class ViewBook extends AppCompatActivity implements View.OnClickListener 
 
                     Log.d("myLogs","View: Edit: " + selectedBook.toString());
 
-                    db.update("bookTable", selectedBook.addBookToCV(), "id = " + selectedBook.id, null);
+                    updateBook(selectedBook);
+                    //db = dbHelper.getReadableDatabase();
+                    //db.update("bookTable", selectedBook.addBookToCV(), "id = " + selectedBook.id, null);
 
                     break;
                 case INTENT_CODE_DELETE:    // delete book activity
-                    db.delete("bookTable", "id = " + selectedBook.id, null);
+
+                    deleteBook(selectedBook);
+                    //db = dbHelper.getReadableDatabase();
+                    //db.delete("bookTable", "id = " + selectedBook.id, null);
                     setResult(RESULT_OK, intent);
                     finish();
                     break;
             }
-            dbHelper.close();
+           // dbHelper.close();
         } else if (resultCode == RESULT_CANCELED){}
           else  {
             Toast.makeText(this, "Wrong result", Toast.LENGTH_SHORT).show();
         }
 
     }
+
+    public void updateBook(final Book thisBook){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                db = dbHelper.getReadableDatabase();
+                db.update("bookTable", thisBook.addBookToCV(),"id = " + thisBook.id, null);
+            }
+        }).start();
+    }
+
+    public void deleteBook(final Book thisBook){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                db = dbHelper.getReadableDatabase();
+                db.delete("bookTable", "id = " + thisBook.id, null);
+            }
+        }).start();
+    }
+
+
 }
