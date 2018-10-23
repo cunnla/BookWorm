@@ -3,6 +3,7 @@ package cunnla.cunnla.bookworm;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -34,6 +35,7 @@ public class DeleteBook extends AppCompatActivity implements View.OnClickListene
         switch (v.getId()) {
             case R.id.btnOk:
                 setResult(RESULT_OK, intent);
+                Log.d("myLogs", "delete result ok");
                 finish();
                 break;
             case R.id.btnCancel:

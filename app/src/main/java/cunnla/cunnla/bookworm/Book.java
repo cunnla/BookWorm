@@ -4,9 +4,13 @@ import android.app.DatePickerDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 import android.widget.DatePicker;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.ParseException;
@@ -15,7 +19,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-public class Book {
+public class Book implements Serializable{     //implements Serializable in order to pass the data from intent to intent
 
     String bookDate, bookName, bookAuthor, bookGenre, bookNotes, id;
     //String dateString = "";
@@ -38,6 +42,8 @@ public class Book {
         this.bookNotes = bookNotes;
         this.id = id;
     }
+
+
 
 
      public ContentValues addBookToCV(){
@@ -102,6 +108,56 @@ public class Book {
          Log.d("myLogs", "Intent: bookdata: "+this.toString());
      }
 
+    public Bundle putDetailsToBundle(){   //we need the bundle for the IntentService
+        Bundle bookExtras = new Bundle();
+        bookExtras.putString("bookDate", this.bookDate);
+        bookExtras.putString("bookName", this.bookName);
+        bookExtras.putString("bookAuthor", this.bookAuthor);
+        bookExtras.putString("bookGenre", this.bookGenre);
+        bookExtras.putString("bookNotes", this.bookNotes);
+        bookExtras.putString("id", this.id);
+        return bookExtras;
+    }
+
+    public void getDetailsFromBundle(Bundle bundle){     //we need the bundle for the IntentService
+
+        if (bundle.getString("bookDate")!=null) {
+            this.bookDate = bundle.getString("bookDate");
+        }
+
+        if (bundle.getString("bookName")!=null) {
+            this.bookName = bundle.getString("bookName");
+        } else {
+            this.bookName = "";
+        }
+
+        if (bundle.getString("bookAuthor")!=null) {
+            this.bookAuthor = bundle.getString("bookAuthor");
+        } else {
+            this.bookAuthor = "";
+        }
+
+        if (bundle.getString("bookGenre")!=null) {
+            this.bookGenre = bundle.getString("bookGenre");
+        } else {
+            this.bookGenre = "";
+        }
+
+        if (bundle.getString("bookNotes")!=null) {
+            this.bookNotes = bundle.getString("bookNotes");
+        } else {
+            this.bookNotes = "";
+        }
+
+        if (bundle.getString("id")!=null) {
+            this.id = bundle.getString("id");
+        }
+
+        Log.d("myLogs", "Bundle: bookdata: "+this.toString());
+    }
+
+
+
      public String bookDateNice() {
          // here we take the date in the mysql format  YYYY-MM-DD HH:MM:SS to 0d-0m-yyyy
 
@@ -155,4 +211,7 @@ public class Book {
     public String toString() {
         return this.bookDate + " : " + this.bookName + " by " + this.bookAuthor + ". "+ this.bookGenre + ". id: " + this.id;
     }
+
+
+
 }

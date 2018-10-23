@@ -129,24 +129,20 @@ public class ViewBook extends AppCompatActivity implements View.OnClickListener 
 
     }
 
-    public void updateBook(final Book thisBook){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                db = dbHelper.getReadableDatabase();
-                db.update("bookTable", thisBook.addBookToCV(),"id = " + thisBook.id, null);
-            }
-        }).start();
+    public void updateBook(final Book selectedBook){
+        Intent intentDBIntentService = new Intent(this, DBIntentService.class);
+        intentDBIntentService.putExtra("selectedBook", selectedBook.putDetailsToBundle()).putExtra("task",
+                "updateBook");
+        startService(intentDBIntentService);
+
     }
 
     public void deleteBook(final Book thisBook){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                db = dbHelper.getReadableDatabase();
-                db.delete("bookTable", "id = " + thisBook.id, null);
-            }
-        }).start();
+        Log.d("myLogs", "thisBook.id: "+selectedBook.id);
+        Intent intentDBIntentService = new Intent(this, DBIntentService.class);
+        intentDBIntentService.putExtra("selectedBook", selectedBook.putDetailsToBundle()).putExtra("task",
+                "deleteBook");
+        startService(intentDBIntentService);
     }
 
 

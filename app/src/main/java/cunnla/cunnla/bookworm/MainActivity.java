@@ -1,6 +1,9 @@
 package cunnla.cunnla.bookworm;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
@@ -26,13 +29,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button btnAdd;
     Spinner spSort, spShowGenre;
     String orderBy = "bookDate DESC";
-    String[] strShowGenre = null;
+    String[] strArrayShowGenre = null;
     String strSelection = null;
 
     DBHelper dbHelper;
     SQLiteDatabase db;
     ListView booksListView;
-    Handler myHandler;
+
+    ArrayList<Book> booksList;
+    private MyBroadcastReceiver mMyBroadcastReceiver;
+
 
     Book selectedBook;
 
@@ -71,12 +77,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         registerForContextMenu(booksListView);
 
         dbHelper = new DBHelper(this);
-      //  dbThread = new DBThread();
 
         selectedBook = new Book();
 
         orderBy = "bookDate DESC";
-        strShowGenre = null;
+        strArrayShowGenre = null;
         strSelection = null;
 
         showAllBooks();
@@ -127,11 +132,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.d("myLogs", "Got to the genre selection");
                 if (pos==0) {
                     strSelection = null;
-                    strShowGenre = null;
+                    strArrayShowGenre = null;
                 } else {
                     strSelection = "bookGenre = ?";
-                    strShowGenre = new String[]{parent.getAdapter().getItem(pos).toString()};
-                    Log.d("myLogs", "strShowGenre: "+strShowGenre[0]);
+                    strArrayShowGenre = new String[]{parent.getAdapter().getItem(pos).toString()};
+
                 }
 
                 showAllBooks();
@@ -229,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     showAllBooks();
                     break;
             }
-            dbHelper.close();
+            //dbHelper.close();
 
         } else if (resultCode == RESULT_CANCELED){
             showAllBooks();
@@ -239,77 +244,76 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    public void addBook(final Book thisBook){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                db = dbHelper.getReadableDatabase();
-                db.insert("bookTable", null, thisBook.addBookToCV());
-                }
-        }).start();
+    public void addBook(final Book selectedBook){
+        Intent intentDBIntentService = new Intent(this, DBIntentService.class);
+        intentDBIntentService.putExtra("selectedBook", selectedBook.putDetailsToBundle()).putExtra("task",
+                "addBook");
+        startService(intentDBIntentService);
     }
 
-    public void updateBook(final Book thisBook){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                db = dbHelper.getReadableDatabase();
-                db.update("bookTable", thisBook.addBookToCV(),"id = " + thisBook.id, null);
-            }
-        }).start();
+    public void updateBook(final Book selectedBook){
+
+        Intent intentDBIntentService = new Intent(this, DBIntentService.class);
+        intentDBIntentService.putExtra("selectedBook", selectedBook.putDetailsToBundle()).putExtra("task",
+                "updateBook");
+        startService(intentDBIntentService);
+
     }
 
-    public void deleteBook(final Book thisBook){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                db = dbHelper.getReadableDatabase();
-                db.delete("bookTable", "id = " + thisBook.id, null);
-            }
-        }).start();
+    public void deleteBook(final Book selectedBook){
+        Log.d("myLogs", "thisBook.id: "+selectedBook.id);
+        Intent intentDBIntentService = new Intent(this, DBIntentService.class);
+        intentDBIntentService.putExtra("selectedBook", selectedBook.putDetailsToBundle()).putExtra("task",
+                "deleteBook");
+        startService(intentDBIntentService);
     }
 
 
     public void showAllBooks(){
 
-        myHandler = new Handler(){
-            public void handleMessage(android.os.Message msg) {
-                BookAdapter bookAdapter = new BookAdapter(getApplicationContext(), 0, (ArrayList<Book>) msg.obj);
-                booksListView.setAdapter(bookAdapter);
-            }
-        };
+        Intent intentDBIntentService = new Intent(this, DBIntentService.class);
+        intentDBIntentService.putExtra("task", "showAllBooks").
+                              putExtra("strSelection", strSelection).
+                              putExtra("strArrayShowGenre", strArrayShowGenre).
+                              putExtra("orderBy", orderBy);
+        startService(intentDBIntentService);
 
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                ArrayList<Book> booksList = new ArrayList<>();
-                db = dbHelper.getReadableDatabase();
-                Cursor cursor = db.query("bookTable", null, strSelection, strShowGenre, null, null, orderBy);
-                if (cursor.moveToFirst()) {
-                    do{
-                        booksList.add( new Book(cursor.getString(cursor.getColumnIndex("bookDate")),
-                                cursor.getString(cursor.getColumnIndex("bookName")),
-                                cursor.getString(cursor.getColumnIndex("bookAuthor")),
-                                cursor.getString(cursor.getColumnIndex("bookGenre")),
-                                cursor.getString(cursor.getColumnIndex("bookNotes")),
-                                cursor.getString(cursor.getColumnIndex("id"))
-                        ));
-                        Log.d(LOG_TAG, "Adding to books list:"+ cursor.getString(cursor.getColumnIndex("bookName")));
-                    }while (cursor.moveToNext());
-                }else
-                    Log.d(LOG_TAG, "0 rows");
-                cursor.close();
-              //  dbHelper.close();
-                Message message = new Message();
-                message.obj = booksList;
-                myHandler.sendMessage(message);
-                }
-        }).start();
+       /// registering the receiver and getting the message
+        mMyBroadcastReceiver = new MyBroadcastReceiver();
+        IntentFilter intentFilter = new IntentFilter("MY_RESPONSE");
+        intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(mMyBroadcastReceiver, intentFilter);
+        Log.d("myLogs", "Register receiver");
 
     }
 
+    public void onResume() {
+        super.onResume();
+        /// registering the receiver and getting the message
+        mMyBroadcastReceiver = new MyBroadcastReceiver();
+        IntentFilter intentFilter = new IntentFilter("MY_RESPONSE");
+        intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(mMyBroadcastReceiver, intentFilter);
+        Log.d("myLogs", "Register receiver");
+    }
 
+    public void onPause() {
+        super.onPause();
+        unregisterReceiver(mMyBroadcastReceiver);
+        Log.d("myLogs", "Unregister receiver");
+    }
 
+    public class MyBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            booksList = (ArrayList<Book>) intent.getSerializableExtra("booksList");
+
+            BookAdapter bookAdapter = new BookAdapter(getApplicationContext(), 0, booksList);
+            booksListView.setAdapter(bookAdapter);
+
+        }
+    }
 
 }
