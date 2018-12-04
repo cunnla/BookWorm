@@ -1,9 +1,0 @@
-An application to store the database of books that the user has read, and to monitor his reading activity
-
-- Uses a database of books that is stored on the user device. The database is dealt with using SQLite and a subclass of SQLiteOpenHelper, and also Cursor and ContentValues. The user can use the sorting (by date, name, author etc.) and arguments selection (show specific book genre).
-- The database operations are processed in a separate thread using IntentService, and the data is sent back via the Broadcast Receiver.
-- The application uses a plain cutom class of Books with its own constructor and methods.
-- Calendar is used via DatePickerDialog.
-- The Books are displayed as an ArrayList wih a customized ArrayAdapter.
-
-

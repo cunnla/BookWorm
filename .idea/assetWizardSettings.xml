@@ -23,7 +23,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="scalingPercent" value="132" />
+                                                <entry key="scalingPercent" value="251" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -33,8 +33,8 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="foregroundImage" value="D:\android\AndroidStudioProjects\BookWorm\design\BookWorm1.png" />
-                                      <entry key="previewDensity" value="XXXHIGH" />
+                                      <entry key="foregroundImage" value="D:\android\AndroidStudioProjects\BookWorm\design\BookWorm-01-01.png" />
+                                      <entry key="previewDensity" value="MEDIUM" />
                                     </map>
                                   </option>
                                 </PersistentState>
