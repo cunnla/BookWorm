@@ -12,7 +12,6 @@
         android:gravity="center_vertical"
         android:background="@color/colorAccent"
         android:orientation="horizontal">
-
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -25,18 +24,81 @@
             android:text="List of Books"
             android:layout_weight="1">
         </TextView>
-
-        <Button
+        <ImageButton
             android:id="@+id/btnAdd"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
+            android:background="@drawable/add"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:layout_marginRight="10dp"
-            android:text="Add Book"
-            android:layout_weight="1">
-        </Button>
+            android:layout_weight="0">
+        </ImageButton>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:gravity="right"
+            android:background="@color/colorAccentLight"
+            android:orientation="horizontal">
+            <ImageButton
+                android:id="@+id/btnSearch"
+                android:background="@drawable/search"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp">
+            </ImageButton>
+        </LinearLayout>
+    </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/llSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/colorAccentLight">
+        <EditText
+            android:id="@+id/etSearch"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_height="wrap_content" >
+        </EditText>
+        <LinearLayout
+            android:id="@+id/llSearchBut"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:orientation="horizontal"
+            android:gravity="right"
+            android:background="@color/colorAccentLight">
+            <ImageButton
+                android:id="@+id/btnSearchOK"
+                android:background="@drawable/ok"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp">
+            </ImageButton>
+            <ImageButton
+                android:id="@+id/btnSearchCancel"
+                android:background="@drawable/cancel"
+                android:gravity="right"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp">
+            </ImageButton>
+        </LinearLayout>
     </LinearLayout>
 
 
@@ -44,6 +106,7 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/llSort"
         android:orientation="horizontal"
         android:background="@color/colorPrimaryVeryDark">
         <Spinner
@@ -56,7 +119,6 @@
             android:layout_marginLeft="10dp"
             android:layout_marginBottom="5dp"
             android:layout_weight="1"/>
-
         <Spinner
             android:id="@+id/spShowGenre"
             android:layout_width="wrap_content"
@@ -67,7 +129,6 @@
             android:layout_marginRight="10dp"
             android:layout_marginBottom="5dp"
             android:layout_weight="1"/>
-
     </LinearLayout>
 
 

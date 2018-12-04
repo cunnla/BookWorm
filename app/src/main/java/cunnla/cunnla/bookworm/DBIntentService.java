@@ -72,17 +72,18 @@ public class DBIntentService extends IntentService {
                 String[]strArrayShowGenre = null;
                 String strSelection = null;
 
+
                 if (intent.getStringExtra("strSelection")!=null){
                     strSelection = intent.getStringExtra("strSelection");
                 }
-
-               // if (intent.getStringExtra("strArrayShowGenre")!=null) {
-                    strArrayShowGenre = intent.getExtras().getStringArray("strArrayShowGenre");
-               // }
-
+                strArrayShowGenre = intent.getExtras().getStringArray("strArrayShowGenre");
                 orderBy = intent.getStringExtra("orderBy");
 
-                Log.d("intentServiceLogs", "orderBy: "+orderBy);
+
+                Log.d("intentServiceLogs", "strSelection: "+strSelection);
+                Log.d("intentServiceLogs", "strArrayShowGenre: "+strArrayShowGenre);
+
+
 
                 Cursor cursor = db.query("bookTable", null, strSelection, strArrayShowGenre, null, null, orderBy);
                 if (cursor.moveToFirst()) {

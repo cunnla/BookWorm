@@ -12,11 +12,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -26,14 +31,15 @@ import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener  {
 
-    Button btnAdd;
+    ImageButton btnAdd, btnSearch, btnSearchOK, btnSearchCancel;
+    LinearLayout llSearch, llSearchBut, llSort;
+    EditText etSearch;
+    boolean btnSearchPressed = false;
     Spinner spSort, spShowGenre;
     String orderBy = "bookDate DESC";
     String[] strArrayShowGenre = null;
     String strSelection = null;
 
-    DBHelper dbHelper;
-    SQLiteDatabase db;
     ListView booksListView;
 
     ArrayList<Book> booksList;
@@ -58,9 +64,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        btnAdd = (Button)findViewById(R.id.btnAdd);
+        btnAdd = (ImageButton)findViewById(R.id.btnAdd);
         btnAdd.setOnClickListener(this);
 
+        btnSearch = (ImageButton)findViewById(R.id.btnSearch);
+        btnSearch.setOnClickListener(this);
+
+        llSearch = (LinearLayout) findViewById(R.id.llSearch);
+        llSearchBut = (LinearLayout) findViewById(R.id.llSearchBut);
+        btnSearchOK = (ImageButton)findViewById(R.id.btnSearchOK);
+        btnSearchOK.setOnClickListener(this);
+        btnSearchCancel = (ImageButton)findViewById(R.id.btnSearchCancel);
+        btnSearchCancel.setOnClickListener(this);
+        etSearch = (EditText) findViewById(R.id.etSearch);
+
+        llSort = (LinearLayout) findViewById(R.id.llSort);
         spSort = (Spinner) findViewById(R.id.spSort);
         spSort.setOnItemSelectedListener(this);
 
@@ -76,20 +94,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         booksListView.setOnItemClickListener(this);
         registerForContextMenu(booksListView);
 
-        dbHelper = new DBHelper(this);
-
         selectedBook = new Book();
 
         orderBy = "bookDate DESC";
         strArrayShowGenre = null;
         strSelection = null;
 
+        //removing the search views
+        llSearch.removeAllViews();
+        llSearchBut.removeAllViews();
+        //llSearchBut.removeView(btnSearchOK);
+        //llSearchBut.removeView(btnSearchCancel);
+
+
         showAllBooks();
 
 
     }
 
-    @Override
+
+
+    @Override       // if we click on a book
     public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
          Log.d(LOG_TAG, "itemClick: position = " + position + ", id = " + id);
          selectedBook = (Book) parent.getAdapter().getItem(position);  // getting our object Book from position in ListView
@@ -98,6 +123,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
          startActivityForResult(intent, INTENT_CODE_VIEW);
     }
 
+
+    // if we click on an option in a spinner - sorting or selecting a genre
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         Log.d("myLogs", "Got to onItemSelected");
 
@@ -151,6 +178,72 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btnAdd:
+                intent = new Intent(this, AddEditBook.class);
+                startActivityForResult(intent, INTENT_CODE_ADD);
+                break;
+            case R.id.btnSearch:
+
+                if (!btnSearchPressed) {
+
+                    llSort.removeAllViews(); // removing the views from the Sort layout
+
+                    // removing any genre selection or sorting
+                    strSelection = null;
+                    strArrayShowGenre = null;
+                    orderBy = "bookDate DESC";
+                    showAllBooks();
+                    spShowGenre.setSelection(0);
+                    spSort.setSelection(0);
+
+
+                    // and adding views to the Search layout
+
+                    llSearch.addView(etSearch);
+                    llSearch.addView(llSearchBut);
+                    llSearchBut.addView(btnSearchOK);
+                    llSearchBut.addView(btnSearchCancel);
+
+
+                    btnSearchPressed = true;
+
+                } else if (btnSearchPressed){
+                    llSearch.removeAllViews();
+                    llSearchBut.removeAllViews();
+                    btnSearchPressed = false;
+
+                    llSort.addView(spSort);
+                    llSort.addView(spShowGenre);
+
+                    // removing any genre selection or sorting
+                    strSelection = null;
+                    strArrayShowGenre = null;
+                    orderBy = "bookDate DESC";
+                    showAllBooks();
+                    spShowGenre.setSelection(0);
+                    spSort.setSelection(0);
+
+                }
+
+                break;
+            case R.id.btnSearchOK:
+                strSelection = "bookName LIKE ? OR bookAuthor LIKE ?";
+                strArrayShowGenre = new String[]{"%"+etSearch.getText().toString()+"%", "%"+etSearch.getText().toString()+"%"};
+                showAllBooks();
+                break;
+            case R.id.btnSearchCancel:
+                strSelection = null;
+                strArrayShowGenre = null;
+                showAllBooks();
+                break;
+        }
+    }
+
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         if (v.getId() == R.id.listBooks) {
@@ -193,15 +286,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onContextItemSelected(item);
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btnAdd:
-            intent = new Intent(this, AddEditBook.class);
-            startActivityForResult(intent, INTENT_CODE_ADD);
-            break;
-        }
-    }
+
 
 
     @Override
@@ -211,7 +296,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         if (resultCode == RESULT_OK) {
-            db = dbHelper.getWritableDatabase();
             switch (requestCode) {
                 case INTENT_CODE_ADD:    // add book activity
                     selectedBook = new Book();
