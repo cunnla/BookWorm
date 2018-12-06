@@ -31,20 +31,21 @@ import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener  {
 
-    ImageButton btnAdd, btnSearch, btnSearchOK, btnSearchCancel;
+    ImageButton btnAdd, btnSearch, btnSearchOK;
     LinearLayout llSearch, llSearchBut, llSort;
     EditText etSearch;
     boolean btnSearchPressed = false;
     Spinner spSort, spShowGenre;
     String orderBy = "bookDate DESC";
-    String[] strArrayShowGenre = null;
-    String strSelection = null;
+    String strGenreSelection = null;
+    String strSearchSelection = null;
+    String strGenreArgs = null;
+    String strSearchArgs = null;
 
     ListView booksListView;
 
     ArrayList<Book> booksList;
     private MyBroadcastReceiver mMyBroadcastReceiver;
-
 
     Book selectedBook;
 
@@ -69,14 +70,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         btnSearch = (ImageButton)findViewById(R.id.btnSearch);
         btnSearch.setOnClickListener(this);
+        btnSearch.setImageResource(R.drawable.search);
 
         llSearch = (LinearLayout) findViewById(R.id.llSearch);
         llSearchBut = (LinearLayout) findViewById(R.id.llSearchBut);
         btnSearchOK = (ImageButton)findViewById(R.id.btnSearchOK);
         btnSearchOK.setOnClickListener(this);
-        btnSearchCancel = (ImageButton)findViewById(R.id.btnSearchCancel);
-        btnSearchCancel.setOnClickListener(this);
+
         etSearch = (EditText) findViewById(R.id.etSearch);
+        etSearch.setHint("Please enter text here");
 
         llSort = (LinearLayout) findViewById(R.id.llSort);
         spSort = (Spinner) findViewById(R.id.spSort);
@@ -97,21 +99,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         selectedBook = new Book();
 
         orderBy = "bookDate DESC";
-        strArrayShowGenre = null;
-        strSelection = null;
+        strGenreSelection = null;
+        strSearchSelection = null;
+        strGenreArgs = null;
+        strSearchArgs = null;
+
 
         //removing the search views
         llSearch.removeAllViews();
         llSearchBut.removeAllViews();
-        //llSearchBut.removeView(btnSearchOK);
-        //llSearchBut.removeView(btnSearchCancel);
-
 
         showAllBooks();
 
 
     }
-
 
 
     @Override       // if we click on a book
@@ -158,15 +159,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.spShowGenre:
                 Log.d("myLogs", "Got to the genre selection");
                 if (pos==0) {
-                    strSelection = null;
-                    strArrayShowGenre = null;
+                    strGenreSelection = null;
+                    strGenreArgs = null;
                 } else {
-                    strSelection = "bookGenre = ?";
-                    strArrayShowGenre = new String[]{parent.getAdapter().getItem(pos).toString()};
-
+                    strGenreSelection = "bookGenre = ?";
+                    strGenreArgs = parent.getAdapter().getItem(pos).toString();
                 }
 
+                Log.d("myLogs", "strGenreSelection: "+strGenreSelection);
+                Log.d("myLogs", "strGenreArgs: "+strGenreArgs);
                 showAllBooks();
+
                 break;
 
         }
@@ -189,55 +192,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btnSearch:
 
                 if (!btnSearchPressed) {
+                    btnSearch.setImageResource(R.drawable.cancel);
 
-                    llSort.removeAllViews(); // removing the views from the Sort layout
-
-                    // removing any genre selection or sorting
-                    strSelection = null;
-                    strArrayShowGenre = null;
-                    orderBy = "bookDate DESC";
-                    showAllBooks();
-                    spShowGenre.setSelection(0);
-                    spSort.setSelection(0);
-
-
-                    // and adding views to the Search layout
-
+                    // adding views to the Search layout
                     llSearch.addView(etSearch);
                     llSearch.addView(llSearchBut);
                     llSearchBut.addView(btnSearchOK);
-                    llSearchBut.addView(btnSearchCancel);
-
 
                     btnSearchPressed = true;
 
                 } else if (btnSearchPressed){
+
+                    btnSearch.setImageResource(R.drawable.search);
+
+                    // removing views from the Search layout
                     llSearch.removeAllViews();
                     llSearchBut.removeAllViews();
-                    btnSearchPressed = false;
 
-                    llSort.addView(spSort);
-                    llSort.addView(spShowGenre);
-
-                    // removing any genre selection or sorting
-                    strSelection = null;
-                    strArrayShowGenre = null;
-                    orderBy = "bookDate DESC";
+                    // cancelling the search
+                    etSearch.setText("");
+                    etSearch.setHint("Please enter text here");
+                    strSearchSelection = null;
+                    strSearchArgs = null;
                     showAllBooks();
-                    spShowGenre.setSelection(0);
-                    spSort.setSelection(0);
 
+                    btnSearchPressed = false;
                 }
 
                 break;
             case R.id.btnSearchOK:
-                strSelection = "bookName LIKE ? OR bookAuthor LIKE ?";
-                strArrayShowGenre = new String[]{"%"+etSearch.getText().toString()+"%", "%"+etSearch.getText().toString()+"%"};
-                showAllBooks();
-                break;
-            case R.id.btnSearchCancel:
-                strSelection = null;
-                strArrayShowGenre = null;
+                strSearchSelection = "bookName LIKE ? OR bookAuthor LIKE ?";
+                strSearchArgs = "%"+etSearch.getText().toString()+"%";
+                Log.d("myLogs", "strSearchSelection: "+strSearchSelection);
+                Log.d("myLogs", "strSearchArgs: "+strSearchArgs);
                 showAllBooks();
                 break;
         }
@@ -318,7 +305,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     showAllBooks();
                     break;
             }
-            //dbHelper.close();
 
         } else if (resultCode == RESULT_CANCELED){
             showAllBooks();
@@ -357,8 +343,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Intent intentDBIntentService = new Intent(this, DBIntentService.class);
         intentDBIntentService.putExtra("task", "showAllBooks").
-                              putExtra("strSelection", strSelection).
-                              putExtra("strArrayShowGenre", strArrayShowGenre).
+                              putExtra("strGenreSelection", strGenreSelection).
+                              putExtra("strGenreArgs", strGenreArgs).
+                              putExtra("strSearchSelection", strSearchSelection).
+                              putExtra("strSearchArgs", strSearchArgs).
                               putExtra("orderBy", orderBy);
         startService(intentDBIntentService);
 

@@ -42,7 +42,7 @@
             android:orientation="horizontal">
             <ImageButton
                 android:id="@+id/btnSearch"
-                android:background="@drawable/search"
+                android:background="@color/colorAccentLight"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginTop="20dp"
@@ -87,6 +87,7 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp">
             </ImageButton>
+            <!--
             <ImageButton
                 android:id="@+id/btnSearchCancel"
                 android:background="@drawable/cancel"
@@ -98,6 +99,7 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp">
             </ImageButton>
+            -->
         </LinearLayout>
     </LinearLayout>
 

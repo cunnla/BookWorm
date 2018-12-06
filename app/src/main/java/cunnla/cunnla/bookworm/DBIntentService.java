@@ -47,6 +47,8 @@ public class DBIntentService extends IntentService {
         dbHelper = new DBHelper(this);
         db = dbHelper.getReadableDatabase();
 
+
+
         switch (task){
 
             case "deleteBook":
@@ -66,26 +68,63 @@ public class DBIntentService extends IntentService {
                 break;
             case "showAllBooks":
 
+
+
                 ArrayList<Book> booksList = new ArrayList<>();
 
                 String orderBy = "bookDate DESC";
-                String[]strArrayShowGenre = null;
+                String strGenreSelection = null;
+                String strSearchSelection = null;
+                String strGenreArgs = null;
+                String strSearchArgs = null;
                 String strSelection = null;
+                String[]strArrayArgs = null;
 
 
-                if (intent.getStringExtra("strSelection")!=null){
-                    strSelection = intent.getStringExtra("strSelection");
+              // getting the genre and search strings from the intent extras
+                if (intent.getStringExtra("strGenreSelection")!=null){
+                    strGenreSelection = intent.getStringExtra("strGenreSelection");
+                    strGenreArgs = intent.getStringExtra("strGenreArgs");
+                    Log.d("intentServiceLogs", "strGenreSelection:  "+strGenreSelection);
+                    Log.d("intentServiceLogs", "strGenreArgs:  "+strGenreArgs);
                 }
-                strArrayShowGenre = intent.getExtras().getStringArray("strArrayShowGenre");
+
+
+                if (intent.getStringExtra("strSearchSelection")!=null){
+                    strSearchSelection = intent.getStringExtra("strSearchSelection");
+                    strSearchArgs = intent.getStringExtra("strSearchArgs");
+                    Log.d("intentServiceLogs", "strSearchSelection:  "+strSearchSelection);
+                    Log.d("intentServiceLogs", "strSearchArgs:  "+strSearchArgs);
+                }
+
+                // forming the Selection and Arguments strings
+                if ((strGenreSelection!=null) && (strSearchSelection==null)){   //if only genre is selected
+                    Log.d("intentServiceLogs", "Only genre is selected");
+                    strSelection = strGenreSelection;
+                    strArrayArgs = new String[]{strGenreArgs};
+                    Log.d("intentServiceLogs", "strSelection: "+strSelection);
+                    Log.d("intentServiceLogs", "strArrayArgs: "+strArrayArgs[0]);
+                }
+                else if ((strGenreSelection==null) && (strSearchSelection!=null)){   //if only search is selected
+                    Log.d("intentServiceLogs", "Only search is selected");
+                    strSelection = strSearchSelection;
+                    strArrayArgs = new String[]{strSearchArgs,strSearchArgs};
+                    Log.d("intentServiceLogs", "strSelection: "+strSelection);
+                }
+                else if ((strGenreSelection!=null) && (strSearchSelection!=null)){   //if both search and genre are selected
+                    Log.d("intentServiceLogs", "Both search and genre are selected");
+                    strSelection = "("+strSearchSelection+") AND "+strGenreSelection;
+                    strArrayArgs = new String[]{strSearchArgs,strSearchArgs,strGenreArgs};
+                    Log.d("intentServiceLogs", "strSelection: "+strSelection);
+                    Log.d("intentServiceLogs", "strArrayArgs: "+strArrayArgs[0]+" "+strArrayArgs[1]+" "+strArrayArgs[2]);
+                }
+
                 orderBy = intent.getStringExtra("orderBy");
-
-
-                Log.d("intentServiceLogs", "strSelection: "+strSelection);
-                Log.d("intentServiceLogs", "strArrayShowGenre: "+strArrayShowGenre);
+                Log.d("intentServiceLogs", "orderBy: "+orderBy);
 
 
 
-                Cursor cursor = db.query("bookTable", null, strSelection, strArrayShowGenre, null, null, orderBy);
+                Cursor cursor = db.query("bookTable", null, strSelection, strArrayArgs, null, null, orderBy);
                 if (cursor.moveToFirst()) {
                     do{
                         booksList.add( new Book(cursor.getString(cursor.getColumnIndex("bookDate")),
@@ -112,6 +151,7 @@ public class DBIntentService extends IntentService {
                 break;
 
         }
+        db.close();
 
 
     }
